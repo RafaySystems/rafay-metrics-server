@@ -6,7 +6,7 @@ ARCH?=amd64
 # Release variables
 # ------------------
 GIT_COMMIT?=$(shell git rev-parse "HEAD^{commit}" 2>/dev/null)
-GIT_TAG?=$(shell git describe --abbrev=0 --tags 2>/dev/null)
+GIT_TAG?=v0.6.3
 BUILD_DATE:=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 # Consts
@@ -30,7 +30,7 @@ all: metrics-server
 SRC_DEPS=$(shell find pkg cmd -type f -name "*.go") go.mod go.sum
 CHECKSUM=$(shell md5sum $(SRC_DEPS) | md5sum | awk '{print $$1}')
 PKG:=k8s.io/client-go/pkg
-LDFLAGS:=-X $(PKG)/version.gitVersion=$(GIT_TAG) -X $(PKG)/version.gitCommit=$(GIT_COMMIT) -X $(PKG)/version.buildDate=$(BUILD_DATE)
+LDFLAGS:=-X $(PKG)/version.gitVersion=$(GIT_TAG)
 
 metrics-server: $(SRC_DEPS)
 	GOARCH=$(ARCH) CGO_ENABLED=0 go build -mod=readonly -ldflags "$(LDFLAGS)" -o metrics-server sigs.k8s.io/metrics-server/cmd/metrics-server
@@ -44,7 +44,7 @@ CONTAINER_ARCH_TARGETS=$(addprefix container-,$(ALL_ARCHITECTURES))
 container:
 	# Pull base image explicitly. Keep in sync with Dockerfile, otherwise
 	# GCB builds will start failing.
-	docker pull golang:1.19.7
+	docker pull golang:1.20.5
 	docker build -t $(REGISTRY)/metrics-server-$(ARCH):$(CHECKSUM) --build-arg ARCH=$(ARCH) --build-arg GIT_TAG=$(GIT_TAG) --build-arg GIT_COMMIT=$(GIT_COMMIT) .
 
 .PHONY: container-all
