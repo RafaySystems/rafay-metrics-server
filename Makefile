@@ -14,7 +14,7 @@ OUTPUT_DIR?=_output
 # Release variables
 # ------------------
 GIT_COMMIT?=$(shell git rev-parse "HEAD^{commit}" 2>/dev/null)
-GIT_TAG?=$(shell git describe --abbrev=0 --tags 2>/dev/null)
+GIT_TAG?=v0.7.0
 BUILD_DATE:=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 # Consts
